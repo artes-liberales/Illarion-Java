@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file is part of Illarion.
+
+Copyright © 2011 - Illarion e.V.
+
+The Illarion Project is free software: you can redistribute
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+
+The Illarion Project is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+the Illarion Project. If not, see <http://www.gnu.org/licenses/>.
+-->
+<project name="Illarion Ivy Imports" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+	<dirname property="ivy.import.dirname" file="${ant.file.Illarion Ivy Imports}"/>
+		
+	<import file="${ivy.import.dirname}/build_include.xml" optional="false" />
+	
+	<property name="ivy.settings.normal" location="${ivy.import.dirname}/ivysettings.xml" />
+    <property name="ivy.settings.full" location="${ivy.import.dirname}/ivysettings-upload.xml" />
+	
+	<!-- - - - - - - - - - - - - - PUBLIC  TARGETS - - - - - - - - - - - - - -->
+    <target name="init-ivy" depends="__init-ivy-without-upload,__init-ivy-with-upload" unless="${ivy.init_done}" description="Download and configure Ivy">
+        <property name="ivy.init_done" value="true" />
+    </target>
+	<!-- - - - - - - - - - - - - - PRIVATE TARGETS - - - - - - - - - - - - - -->
+    <!-- Don't call them! Ever! I mean it. Nothing good comes from it.       -->
+	
+	<!-- Prepare Ivy without the features to upload anything.                -->
+	<target name="__init-ivy-without-upload" depends="check_optional_dirs,__install_ivy" unless="${keys.exist}">
+		<ivy:configure file="${ivy.settings.normal}" />
+		<echo message="Ivy is prepared - Without upload features" level="info" />
+	</target>
+
+    <!-- Prepare Ivy with the features to upload the libraries.              -->
+    <target name="__init-ivy-with-upload" depends="check_optional_dirs,__install_ivy" if="${keys.exist}">
+        <ivy:configure file="${ivy.settings.full}" />
+        <echo message="Ivy is prepared - With upload features" level="info" />
+    </target>
+	
+	<!-- Download Ivy if needed and define the tasks needed for Ivy          -->
+	<target name="__install_ivy">
+        <mkdir dir="${ivy.import.dirname}/${ivyenv.jar.dir}" />
+        <get src="${ivy.jar.url}" dest="${ivy.import.dirname}/${ivy.jar.file}" usetimestamp="true" />
+        <get src="${jsch.jar.url}" dest="${ivy.import.dirname}/${jsch.jar.file}" usetimestamp="true" />
+
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" format="xml" uri="antlib:org.apache.ivy.ant">
+            <classpath>
+                <fileset dir="${ivy.import.dirname}/${ivyenv.jar.dir}" includes="*.jar" />
+            </classpath>
+        </taskdef>
+	</target>
+</project>

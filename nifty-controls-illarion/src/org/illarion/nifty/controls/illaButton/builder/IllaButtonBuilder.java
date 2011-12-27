@@ -2,8 +2,6 @@ package org.illarion.nifty.controls.illaButton.builder;
 
 import de.lessvoid.nifty.builder.ControlBuilder;
 
-import de.lessvoid.nifty.builder.ControlBuilder;
-
 public class IllaButtonBuilder extends ControlBuilder  {
 	 public IllaButtonBuilder(final String id) {
 		    super(id, "illaButton");

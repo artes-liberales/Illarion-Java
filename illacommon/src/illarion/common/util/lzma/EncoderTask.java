@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 
-import SevenZip.Compression.LZMA.Encoder;
+import lzma.sdk.lzma.Encoder;
 
 /**
  * The encoder task is taking care for the LZMA compression of the data that are
@@ -74,10 +74,10 @@ final class EncoderTask implements Callable<Boolean> {
         in = ConcurrentBufferInputStream.create(q);
         out = _out;
         enc = new Encoder();
-        enc.SetDictionarySize(1 << (dictSzPow2 < 0 ? DEFAULT_DICT_SZ_POW2
+        enc.setDictionarySize(1 << (dictSzPow2 < 0 ? DEFAULT_DICT_SZ_POW2
             : dictSzPow2));
         if (fastBytes < 0) {
-            enc.SetNumFastBytes(fastBytes);
+            enc.setNumFastBytes(fastBytes);
         }
     }
 
@@ -86,8 +86,8 @@ final class EncoderTask implements Callable<Boolean> {
      */
     @Override
     public Boolean call() throws IOException {
-        enc.SetEndMarkerMode(true);
-        enc.Code(in, out, -1, -1, null);
+        enc.setEndMarkerMode(true);
+        enc.code(in, out, -1, -1, null);
         out.close();
         return Boolean.TRUE;
     }

@@ -65,12 +65,6 @@ public final class CrashReporter {
     public static final int DISPLAY_SWING = 2;
 
     /**
-     * This constant is used as display value in case the crash reporter is
-     * supposed to display the crash window as SWT window.
-     */
-    public static final int DISPLAY_SWT = 3;
-
-    /**
      * This constant is used as mode value in case the crash reporter is
      * supposed to send the crash reports every time.
      */
@@ -216,10 +210,6 @@ public final class CrashReporter {
                         constr =
                             Reflection.getInstance().getConstructor(
                                 "illarion.common.bug.ReportDialogAwt()");
-                    } else if (display == DISPLAY_SWT) {
-                        constr =
-                            Reflection.getInstance().getConstructor(
-                                "illarion.common.bug.ReportDialogSwt()");
                     }
 
                     if (constr == null) {
@@ -285,8 +275,7 @@ public final class CrashReporter {
      */
     @SuppressWarnings("nls")
     public void setDisplay(final int newDisplay) {
-        if ((newDisplay != DISPLAY_AWT) && (newDisplay != DISPLAY_SWING)
-            && (newDisplay != DISPLAY_SWT)) {
+        if ((newDisplay != DISPLAY_AWT) && (newDisplay != DISPLAY_SWING)) {
             throw new IllegalArgumentException("Illegal display value: "
                 + Integer.toString(newDisplay));
         }

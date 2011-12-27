@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 
-import SevenZip.Compression.LZMA.Decoder;
+import lzma.sdk.lzma.Decoder;
 
 /**
  * The decoder task is taking care for decompressing LZMA data from a input
@@ -89,8 +89,8 @@ final class DecoderTask implements Callable<Boolean> {
     public Boolean call() throws IOException {
         try {
             final long outSize = -1;
-            dec.SetDecoderProperties(props);
-            dec.Code(in, out, outSize);
+            dec.setDecoderProperties(props);
+            dec.code(in, out, outSize);
         } finally {
             out.close();
         }

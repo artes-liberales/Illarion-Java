@@ -1,34 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- This file is part of the Illarion Client.
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the Illarion Nifty-GUI Controls
 
 Copyright © 2011 - Illarion e.V.
 
-The Illarion Client is free software: you can redistribute i
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the License,
-or (at your option) any later version.
+The Illarion Nifty-GUI Controls is free software: you can redistribute and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
 
-The Illarion Client is distributed in the hope that it will be
+The Illarion Nifty-GUI Controls is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the Illarion Client. If not, see <http://www.gnu.org/licenses/>.
+the Illarion Nifty-GUI Controls. If not, see <http://www.gnu.org/licenses/>.
 -->
-<project name="Illarion Client" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-    <description>Build the Illarion Client</description>
+<project name="Illarion Nifty Controls" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+	<description>Build the Illarion Nifty-GUI controls</description>
 
-    <import file="../build_include.xml" optional="false" />
-    
-    <dirname property="workingDir" file="${ant.file.Illarion Client}" />
+	<import file="../build_include.xml" optional="false" />
+	
+	<dirname property="workingDir" file="${ant.file.Illarion Nifty Controls}" />
 
-    <property name="name" value="${client.name}" />
+    <property name="name" value="${nifty-controls-illarion.name}" />
     <property name="organisation" value="${illarion.organisation}" />
-    <property name="artifact" value="${client.artifact}" />
-    <property name="baseversion" value="${client.version}" />
+    <property name="artifact" value="${nifty-controls-illarion.artifact}" />
+    <property name="baseversion" value="${nifty-controls-illarion.version}" />
 
     <property name="src" location="${workingDir}/src" />
+    <property name="src-controls" location="${workingDir}/nifty-controls" />
     <property name="classes" location="${workingDir}/antclasses" />
     <property name="javadoc" location="${workingDir}/javadoc" />
     <property name="jar" location="${workingDir}/compiled.jar" />
@@ -43,7 +45,10 @@ the Illarion Client. If not, see <http://www.gnu.org/licenses/>.
             <classpath refid="building.classpath"/>
         </javac>
         <copy todir="${classes}">
-            <fileset dir="${src}">
+             <fileset dir="${src}">
+                 <exclude name="**/*.java"/>
+             </fileset>
+            <fileset dir="${src-controls}">
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>

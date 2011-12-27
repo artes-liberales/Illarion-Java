@@ -1,33 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- This file is part of the Illarion Client.
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of the Illarion Nifty-GUI Style.
 
 Copyright © 2011 - Illarion e.V.
 
-The Illarion Client is free software: you can redistribute i
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the License,
-or (at your option) any later version.
+The Illarion Nifty-GUI Style is free software: you can redistribute and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
 
-The Illarion Client is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
+The Illarion Nifty-GUI Style is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-the Illarion Client. If not, see <http://www.gnu.org/licenses/>.
+the Illarion Nifty-GUI Style. If not, see <http://www.gnu.org/licenses/>.
 -->
-<project name="Illarion Client" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-    <description>Build the Illarion Client</description>
+<project name="Illarion Nifty Style" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+	<description>Build the Illarion Nifty-GUI Style</description>
 
-    <import file="../build_include.xml" optional="false" />
-    
-    <dirname property="workingDir" file="${ant.file.Illarion Client}" />
+	<import file="../build_include.xml" optional="false" />
+	
+	<dirname property="workingDir" file="${ant.file.Illarion Nifty Style}" />
 
-    <property name="name" value="${client.name}" />
+    <property name="name" value="${nifty-style-illarion.name}" />
     <property name="organisation" value="${illarion.organisation}" />
-    <property name="artifact" value="${client.artifact}" />
-    <property name="baseversion" value="${client.version}" />
+    <property name="artifact" value="${nifty-style-illarion.artifact}" />
+    <property name="baseversion" value="${nifty-style-illarion.version}" />
 
+	
     <property name="src" location="${workingDir}/src" />
     <property name="classes" location="${workingDir}/antclasses" />
     <property name="javadoc" location="${workingDir}/javadoc" />
@@ -42,11 +44,11 @@ the Illarion Client. If not, see <http://www.gnu.org/licenses/>.
         <javac srcdir="${src}" destdir="${classes}" source="${source.version}" target="${target.version}" encoding="${source.encoding}" compiler="${build.compiler}" debug="${build.debug}" debuglevel="${build.debuglevel}" includeantruntime="false" includejavaruntime="false">
             <classpath refid="building.classpath"/>
         </javac>
-        <copy todir="${classes}">
-            <fileset dir="${src}">
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
+    	<copy todir="${classes}">
+    	    <fileset dir="${src}">
+    	        <exclude name="**/*.java"/>
+    	    </fileset>
+    	</copy>
         <jar jarfile="${jar}" basedir="${classes}">
             <metainf dir="${workingDir}">
                 <include name="*.txt" />
@@ -72,15 +74,6 @@ the Illarion Client. If not, see <http://www.gnu.org/licenses/>.
         <verifyjar alias="${storealias}" storepass="${storepass}" keystore="${keystore}" certificates="yes" verbose="no" storetype="${storetype}" jar="${jar}" />
         <move file="${jar}" tofile="${devrepo}/${organisation}/${artifact}/jars/${artifact}-${ivy.new.revision}.jar" overwrite="yes" />
         <zip destfile="${devrepo}/${organisation}/${artifact}/sources/${artifact}-${ivy.new.revision}.zip" basedir="${src}">
-            <include name="*.*" />
-            <include name="**/*.*" />
-        </zip>
-        
-        <mkdir dir="${javadoc}" />
-        <javadoc sourcepath="${src}" source="${source.version}" destdir="${javadoc}">
-            <classpath refid="building.classpath"/>
-        </javadoc>
-        <zip destfile="${devrepo}/${organisation}/${artifact}/javadocs/${artifact}-${ivy.new.revision}.zip" basedir="${javadoc}">
             <include name="*.*" />
             <include name="**/*.*" />
         </zip>

@@ -1,5 +1,6 @@
 
 **/classes
+**/javadoc
 **/antclasses
 **/*.jar
 /illacommon/lib
@@ -11,3 +12,4 @@
 /keys
 /bin
 /setup
+/libs

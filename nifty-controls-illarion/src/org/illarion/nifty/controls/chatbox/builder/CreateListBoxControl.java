@@ -10,6 +10,7 @@ import de.lessvoid.nifty.loaderv2.types.ControlType;
 import de.lessvoid.nifty.loaderv2.types.ElementType;
 import de.lessvoid.nifty.screen.Screen;
 
+@SuppressWarnings("deprecation")
 public class CreateListBoxControl extends ControlAttributes {
   public CreateListBoxControl() {
     setAutoId(NiftyIdCreator.generate());

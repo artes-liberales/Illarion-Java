@@ -16,11 +16,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 the Illarion Common Library. If not, see <http://www.gnu.org/licenses/>.
 -->
-<project name="Illarion Build Imports" basedir=".">
+<project name="Illarion Build Imports" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 	<property file="../illacommon/local.location.properties" />
 	<property file="../illacommon/location.properties" />
 
 	<import file="${sign}/build_keys.xml" optional="true" />
+	
+    <property name="common.dir" location="${common}/." />
+	
+    <property file="${common.dir}/ivy.properties" />
 
 	<!-- Base folders -->
 	<property name="client.jar" value="illarion_client.jar" />
@@ -64,7 +68,6 @@ the Illarion Common Library. If not, see <http://www.gnu.org/licenses/>.
 	<property name="client.name" value="Illarion Client" />
 
 	<!-- Common informations -->
-	<property name="common.version" value="1.22" />
 	<property name="common.vendor" value="Illarion e.V." />
 	<property name="common.name" value="Illarion Common Library" />
 
@@ -346,7 +349,6 @@ the Illarion Common Library. If not, see <http://www.gnu.org/licenses/>.
 
 	<!-- Create config tool Tasks -->
 	<target name="buildTasks">
-		<echo>java.library.path = ${java.library.path}</echo>
 		<taskdef resource="illarion/build/illabuild.properties">
 			<classpath>
 				<pathelement location="${build.bin}" />
@@ -412,6 +414,22 @@ the Illarion Common Library. If not, see <http://www.gnu.org/licenses/>.
 			<exclude name="*i586*" />
 		</patternset>
 	</target>
+	
+    <target name="init-ivy" unless="${ivy.init_done}">
+        <mkdir dir="${ivyenv.jar.dir}" />
+        <get src="${ivy.jar.url}" dest="${ivy.jar.file}" usetimestamp="true" />
+        <get src="${jsch.jar.url}" dest="${jsch.jar.file}" usetimestamp="true" />
+
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" format="xml">
+            <classpath>
+                <fileset dir="${ivyenv.jar.dir}" includes="*.jar" />
+            </classpath>
+        </taskdef>
+    	
+        <ivy:configure file="${common}/ivysettings.xml" />
+    	
+    	<property name="ivy.init_done" value="true" />
+    </target>
 
 	<target name="check_optional_dirs">
 		<available filepath="${sign}" file="${sign}" property="keys.exist" type="dir" />

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file is part of the Illarion Common Library.
+
+Copyright © 2011 - Illarion e.V.
+
+The Illarion Common Library is free software: you can redistribute i
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+
+The Illarion Common Library is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+the Illarion Common Library. If not, see <http://www.gnu.org/licenses/>.
+-->
+<project name="Illarion Build Imports" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+    <dirname property="build.import.dirname" file="${ant.file.Illarion Build Imports}"/>
+	
+	<property file="${build.import.dirname}/build.local.properties" />
+    <property file="${build.import.dirname}/build.properties" />
+	
+	<import file="${sign}/build_keys.xml" optional="true" />
+    <import file="${build.import.dirname}/build_ivy.xml" optional="false" />
+	
+	<property name="devrepo" location="${build.import.dirname}/${devrepo.dir}" />
+	
+    <!-- Compile informations -->
+    <property name="build.compiler" value="javac1.6" />
+    <property name="build.debug" value="on" />
+    <property name="build.debuglevel" value="lines,vars,source" />
+    <property name="source.version" value="1.6" />
+    <property name="target.version" value="1.6" />
+    <property name="source.encoding" value="UTF-8" />
+    <property name="build.index" value="false" />
+    
+    <!-- Generate the timestamp of the current compile time -->
+    <tstamp />
+
+	<target name="check_optional_dirs">
+		<available filepath="${sign}" file="${sign}" property="keys.exist" type="dir" />
+		<available filepath="${config}" file="${config}" property="config.exist" type="dir" />
+		<condition property="not.keys.exist">
+			<not>
+				<isset property="keys.exist" />
+			</not>
+		</condition>
+		<condition property="not.config.exist">
+			<not>
+				<isset property="config.exist" />
+			</not>
+		</condition>
+		<condition property="keys.config.exist" else="not.keys.config.exist">
+			<and>
+				<isset property="keys.exist" />
+				<isset property="config.exist" />
+			</and>
+		</condition>
+	</target>
+</project>

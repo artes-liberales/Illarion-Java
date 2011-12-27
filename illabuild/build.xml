@@ -4,7 +4,7 @@ This file is part of the Illarion Build Utility.
 
 Copyright © 2011 - Illarion e.V.
 
-The Illarion Build Utility is free software: you can redistribute i and/or
+The Illarion Build Utility is free software: you can redistribute and/or
 modify it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
@@ -17,55 +17,99 @@ Public License for more details.
 You should have received a copy of the GNU General Public License along with
 the Illarion Build Utility. If not, see <http://www.gnu.org/licenses/>.
 -->
-<project name="Illarion Build Utilitiy" default="build_buildutil" basedir=".">
-	<description>
-           Build the Illarion Build Utility
-    </description>
+<project name="Illarion Build Utilitiy" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+	<description>Build the Illarion Build Utility</description>
 
-	<import file="../illacommon/build_include.xml" />
+	<import file="../build_include.xml" optional="false" />
+	
+	<dirname property="workingDir" file="${ant.file.Illarion Build Utilitiy}" />
 
-	<property name="src" location="${build}/src" />
-	<property name="res" location="${build}/res" />
-	<property name="classes" location="${build}/antclasses" />
-	<property name="jar" location="${build}/${build.jar}" />
+    <property name="name" value="${build.name}" />
+	<property name="organisation" value="${illarion.organisation}" />
+	<property name="artifact" value="${build.artifact}" />
+    <property name="baseversion" value="${build.version}" />
 
-	<target name="build_buildutil" description="build the build utility jar file" depends="init, compile_buildutil">
-        <move file="${jar}" tofile="${build.bin}" failonerror="false" />
-		<delete file="${jar}" failonerror="false" />
+	<property name="src" location="${workingDir}/src" />
+	<property name="classes" location="${workingDir}/antclasses" />
+    <property name="javadoc" location="${workingDir}/javadoc" />
+	<property name="jar" location="${workingDir}/compiled.jar" />
+    <property name="ivy" location="${workingDir}/ivy.xml" />
+
+	<!-- - - - - - - - - - - - - - PUBLIC  TARGETS - - - - - - - - - - - - - -->
+    <target name="compile" depends="welcome,retrieve-deps" description="Compile the source files">
+        <ivy:resolve file="${ivy}" />
+    	
+        <mkdir dir="${classes}" />
+        <javac srcdir="${src}" destdir="${classes}" source="${source.version}" target="${target.version}" encoding="${source.encoding}" compiler="${build.compiler}" debug="${build.debug}" debuglevel="${build.debuglevel}" includeantruntime="false" includejavaruntime="false">
+            <classpath refid="building.classpath"/>
+        </javac>
+        <copy todir="${classes}">
+            <fileset dir="${src}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <jar jarfile="${jar}" basedir="${classes}">
+            <metainf dir="${workingDir}">
+                <include name="*.txt" />
+            </metainf>
+            <manifest>
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Built-Date" value="${TODAY}" />
+                <attribute name="Implementation-Vendor" value="${illarion.vendor}" />
+                <attribute name="Implementation-Title" value="${name}" />
+                <attribute name="Implementation-Version" value="${baseversion}" />
+            </manifest>
+        </jar>
+    </target>
+	
+	<target name="publish" depends="compile,deliver,check_optional_dirs" description="Create all components needed for publishing this project." if="${keys.exist}">
+		<mkdir dir="${devrepo}/${organisation}/${artifact}/jars" />
+        <mkdir dir="${devrepo}/${organisation}/${artifact}/sources/" />
+        <mkdir dir="${devrepo}/${organisation}/${artifact}/javadocs/" />
+		
+		<ivy:buildnumber resolver="illarion" organisation="${organisation}" module="${artifact}" revision="${baseversion}-b" defaultBuildNumber="1" revSep=""/>
+		        
+        <signjar alias="${storealias}" storepass="${storepass}" keystore="${keystore}" storetype="${storetype}" jar="${jar}" />	
+		<verifyjar alias="${storealias}" storepass="${storepass}" keystore="${keystore}" certificates="yes" verbose="no" storetype="${storetype}" jar="${jar}" />
+        <move file="${jar}" tofile="${devrepo}/${organisation}/${artifact}/jars/${artifact}-${ivy.new.revision}.jar" overwrite="yes" />
+        <zip destfile="${devrepo}/${organisation}/${artifact}/sources/${artifact}-${ivy.new.revision}.zip" basedir="${src}">
+            <include name="*.*" />
+            <include name="**/*.*" />
+        </zip>
+		
+        <mkdir dir="${javadoc}" />
+        <javadoc sourcepath="${src}" source="${source.version}" destdir="${javadoc}">
+            <classpath refid="building.classpath"/>
+        </javadoc>
+        <zip destfile="${devrepo}/${organisation}/${artifact}/javadocs/${artifact}-${ivy.new.revision}.zip" basedir="${javadoc}">
+            <include name="*.*" />
+            <include name="**/*.*" />
+        </zip>
+	</target>
+	
+	<target name="upload" depends="publish" description="Upload the newly build version to the server repository." if="${keys.exist}">
+        <ivy:publish artifactspattern="${devrepo}/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" resolver="illarion-sftp" pubrevision="${ivy.new.revision}" status="milestone" overwrite="true" />  
+		<echo message="Project ${name} released with version ${ivy.new.revision}" />
 	</target>
 
-	<target name="compile_buildutil">
-		<delete dir="${classes}" />
-		<mkdir dir="${classes}" />
+    <!-- - - - - - - - - - - - - - PRIVATE TARGETS - - - - - - - - - - - - - -->
+	<!-- Don't call them! Ever! I mean it. Nothing good comes from it.       -->
+    <target name="resolve-deps" depends="init-ivy"><!-- Resolve the dependencies -->
+        <ivy:resolve file="${ivy}" refresh="true" />
+        <ivy:cachepath pathid="building.classpath" conf="default" />
+    </target>
 
-		<javac includeantruntime="true" includejavaruntime="true"
-			srcdir="${src}" destdir="${classes}" source="${source.version}"
-			target="${target.version}" encoding="${source.encoding}"
-			compiler="${build.compiler}" debug="${build.debug}"
-			debuglevel="${build.debuglevel}">
-			<classpath>
-                <fileset refid="twl" />
-				<pathelement location="${common.bin}" />
-				<pathelement path="${java.home}/lib" />
-			</classpath>
-		</javac>
-
-		<jar jarfile="${jar}" basedir="${classes}" includes="illarion/build/**">
-			<fileset dir="${classes}">
-			    <include name="illarion/build/**"/>
-			</fileset>
-            <fileset dir="${src}">
-                <include name="illarion/build/illabuild.properties"/>
-            </fileset>
-            <zipfileset src="${common.bin}" />
-			<manifest>
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Built-Date" value="${TODAY}" />
-				<attribute name="Implementation-Vendor" value="${easynpc.vendor}" />
-				<attribute name="Implementation-Title" value="${easynpc.name}" />
-				<attribute name="Implementation-Version" value="${easynpc.version}" />
-			</manifest>
-		</jar>
-		<delete dir="${classes}" />
+    <target name="retrieve-deps" depends="resolve-deps"><!-- Download the dependencies -->
+        <ivy:retrieve pattern="${devrepo}/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
+    </target>
+    
+    <target name="deliver" depends="resolve-deps"><!-- Create the ivy.xml file for the buildtool -->
+        <ivy:deliver conf="*(public)" deliverpattern="${devrepo}/[organisation]/[module]/ivys/[artifact]-[revision].[ext]" />
+    </target>
+	
+	<target name="welcome">
+		<echo>${ant.project.name} is now building.</echo>
+        <echo>using ${ant.version}</echo>
+        <echo>on Java ${java.version} and ${os.name} (${os.arch})</echo>
 	</target>
 </project>
